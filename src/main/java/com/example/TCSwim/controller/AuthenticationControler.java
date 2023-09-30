@@ -2,6 +2,7 @@ package com.example.TCSwim.controller;
 
 import com.example.TCSwim.dto.AthleteDto;
 import com.example.TCSwim.dto.UsersDto;
+import com.example.TCSwim.infra.security.TokenService;
 import com.example.TCSwim.model.Athlete;
 import com.example.TCSwim.model.Users;
 import com.example.TCSwim.repository.AthleteRepository;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,12 +30,26 @@ public class AuthenticationControler {
     private AuthenticationManager authenticationManager;
     @Autowired
     private UserRepository userRepository;
-    @PostMapping("/login")
-        public ResponseEntity<Users> login(@RequestBody @Valid AuthenticationDto authenticationDto ) {
-        var userNamePass = new UsernamePasswordAuthenticationToken(authenticationDto.userName(), authenticationDto.password());
-        var auth = authenticationManager.authenticate(userNamePass);
 
-        return ResponseEntity.ok().build();
+    @Autowired
+    private TokenService tokenService;
+
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody @Valid AuthenticationDto authenticationDto ) {
+        try {
+            var userNamePass = new UsernamePasswordAuthenticationToken(authenticationDto.userName(), authenticationDto.password());
+            var auth = authenticationManager.authenticate(userNamePass);
+            var token = tokenService.generateToken((Users)auth.getPrincipal());
+            String respLogged = "Usuário autenticado! \nToken: " + token;
+            // Verifica se a autenticação foi feita com sucesso
+            if (auth.isAuthenticated()) {
+                return ResponseEntity.status(HttpStatus.OK).body(respLogged);
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("A autenticação falhou!");
+            }
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário ou senha incorretos!");
+        }
     }
 
     @PostMapping("/register")
