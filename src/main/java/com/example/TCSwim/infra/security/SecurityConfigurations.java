@@ -19,10 +19,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfigurations {
     //Corrente de filtro de segurança == metodos de validaçõs de usuario (pode ou n ir pra algum lugar)
-
     @Autowired
     SecurityFilter securityFilter;
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
@@ -31,10 +29,11 @@ public class SecurityConfigurations {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/register").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/athlete")
-                        .hasRole("COACH")
-                        .anyRequest()
-                        .authenticated()
+                        .requestMatchers(HttpMethod.GET, "/athlete", "/athlete/",
+                                "/club", "/club/").hasRole("COACH")
+                        .requestMatchers(HttpMethod.POST, "/club", "/athlete").hasRole("HEADCOACH")
+                        .requestMatchers(HttpMethod.PUT, "/athlete/").hasRole("HEADCOACH")
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -49,3 +48,5 @@ public class SecurityConfigurations {
         return new BCryptPasswordEncoder();
     }
 }
+
+

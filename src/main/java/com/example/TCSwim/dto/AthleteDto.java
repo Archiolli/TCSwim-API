@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.Date;
 
-public record AthleteDto(@NotBlank Long idAthlete, @NotBlank String athleteName,
+public record AthleteDto(@NotBlank String athleteName,
                          @NotNull String athleteHeight,
                          @NotBlank Long idClub,
                          @NotNull String responsibleCoach,

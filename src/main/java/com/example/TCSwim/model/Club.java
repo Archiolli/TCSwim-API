@@ -22,8 +22,10 @@ public class Club implements Serializable {
     private String nameClub;
     @Column(name = "UF_CLUB")
     private String ufClub;
-    @Column(name = "CNPJ_CLUB")
-    private String cnpjClub;
+    @Column(name = "CREDENTIAL_CLUB")
+    private String credentialClub;
+    @Column(name = "QT_ATHLETES_ACTIVES")
+    private String qtAthletesActives;
 
 
 

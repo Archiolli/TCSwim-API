@@ -32,18 +32,15 @@ public class Users implements UserDetails {
     @Column(name = "ROLE")
     private UserRoles role;
 
-//    public Users(String userName, String password, UserRoles role){
-//        this.userName = userName;
-//        this.password = password;
-//        this.role = role;
-//    }
-
-
-
     //validações
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if(this.role == UserRoles.COACH ) {
+        if(this.role == UserRoles.HEADCOACH ) {
+            return List.of(new SimpleGrantedAuthority("ROLE_HEADCOACH"),
+                    new SimpleGrantedAuthority("ROLE_COACH"),
+                    new SimpleGrantedAuthority("ROLE_ATHLETE")
+                    );
+        }else if(this.role == UserRoles.COACH){
             return List.of(new SimpleGrantedAuthority("ROLE_COACH"),
                     new SimpleGrantedAuthority("ROLE_ATHLETE"));
         }else{

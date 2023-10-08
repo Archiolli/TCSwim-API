@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,42 +32,33 @@ public class AthleteControler {
         return ResponseEntity.status(HttpStatus.CREATED).body(athleteRepository.save(athleteModel));
     }
 
-
-
     @GetMapping("/athlete")
     public ResponseEntity<List<Athlete>> getAllAthletes() {
         return ResponseEntity.status(HttpStatus.OK).body((athleteRepository.findAll()));
     }
 
     @GetMapping("/athlete/{id}")
-    public ResponseEntity<Object> getBemById(@PathVariable(value = "id") Long id) {
+    public ResponseEntity<Object> getAthleteById(@PathVariable(value = "id") Long id) {
         Optional<Athlete> athlete = athleteRepository.findById(id);
         return athlete.<ResponseEntity<Object>>map(athlete1 -> ResponseEntity.status(HttpStatus.OK)
                 .body(athlete1)).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body("Atleta não encontrado!"));
     }
-/*
-    @PutMapping("/bens/{id}")
-    public ResponseEntity<Object> updateBemDisponivel(@PathVariable(value = "id") Long id,
-                                                      @RequestBody @Valid BemDisponivelRecordDto bemDisponivelRecordDto){
-        var bem = bemDisponivelRepository.findById(id);
-        var categoria = categoriaRepository.findById(bemDisponivelRecordDto.categoriaId());
-        if(bem.isEmpty()){
-            var map = new HashMap<String, String>();
-            map.put("message", "Bem disponível não encontrado");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(map);
-        }
-        if (categoria.isEmpty()){
-            var map = new HashMap<String, String>();
-            map.put("message", "Categoria não encontrada");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(map);
-        }
-        var bemModel = bem.get();
-        BeanUtils.copyProperties(bemDisponivelRecordDto, bemModel);
-        bemModel.setCategoria(categoria.get());
-        return ResponseEntity.status(HttpStatus.OK).body(bemDisponivelRepository.save(bemModel));
-    }
 
+    @PutMapping("/athlete/{id}")
+    public ResponseEntity<Object> updateAthlete(@PathVariable(value = "id") Long id,
+                                                      @RequestBody @Valid AthleteDto athleteDto){
+        var athlete = athleteRepository.findById(id);
+        if(athlete.isEmpty()){
+            var map = new HashMap<String, String>();
+            map.put("message", "Atleta não encontrado");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(map);
+        }
+        var athl = athlete.get();
+        BeanUtils.copyProperties(athleteDto, athl);
+        return ResponseEntity.status(HttpStatus.OK).body(athleteRepository.save(athl));
+    }
+/*
     @PatchMapping("/bens/{id}")
     public ResponseEntity<Object> patchBemDisponivel(@PathVariable(value = "id") Long id,
                                                      @RequestBody JsonNode bemDisponivel){
